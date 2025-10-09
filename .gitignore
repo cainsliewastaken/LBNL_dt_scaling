@@ -1,0 +1,4 @@
+training_data/
+model_chkpts_scratch/
+wandb/
+__pycache__/

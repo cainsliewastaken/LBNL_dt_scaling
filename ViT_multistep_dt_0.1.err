@@ -1,0 +1,57 @@
++ srun -l bash -c '
+    source export_DDP_vars.sh 
+    python -u -m train_2d_turb_ddp.py --config config.yaml
+    '
+2: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+2:   warnings.warn(
+2: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+2:   warnings.warn(
+3: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+3:   warnings.warn(
+3: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+3:   warnings.warn(
+1: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+1:   warnings.warn(
+1: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+1:   warnings.warn(
+0: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'repr' attribute with value False was provided to the `Field()` function, which has no effect in the context it was used. 'repr' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+0:   warnings.warn(
+0: /global/homes/c/cainslie/.conda/envs/cainslie_env/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:2249: UnsupportedFieldAttributeWarning: The 'frozen' attribute with value True was provided to the `Field()` function, which has no effect in the context it was used. 'frozen' is field-specific metadata, and can only be attached to a model field using `Annotated` metadata or by assignment. This may have happened because an `Annotated` type alias using the `type` statement was used, or if the `Field()` function was attached to a single member of a union type.
+0:   warnings.warn(
+3: Traceback (most recent call last):
+3:   File "<frozen runpy>", line 189, in _run_module_as_main
+3:   File "<frozen runpy>", line 112, in _get_module_details
+3:   File "/global/u2/c/cainslie/LBNL_dt_scaling/train_2d_turb_ddp.py", line 14, in <module>
+3:     from load_data import *
+3:   File "/global/u2/c/cainslie/LBNL_dt_scaling/load_data.py", line 2, in <module>
+3:     from utilities3 import *
+3: ModuleNotFoundError: No module named 'utilities3'
+2: Traceback (most recent call last):
+2:   File "<frozen runpy>", line 189, in _run_module_as_main
+2:   File "<frozen runpy>", line 112, in _get_module_details
+2:   File "/global/u2/c/cainslie/LBNL_dt_scaling/train_2d_turb_ddp.py", line 14, in <module>
+2:     from load_data import *
+2:   File "/global/u2/c/cainslie/LBNL_dt_scaling/load_data.py", line 2, in <module>
+2:     from utilities3 import *
+2: ModuleNotFoundError: No module named 'utilities3'
+srun: error: nid008253: tasks 2-3: Exited with exit code 1
+srun: Terminating StepId=43784713.0
+1: Traceback (most recent call last):
+1:   File "<frozen runpy>", line 189, in _run_module_as_main
+1:   File "<frozen runpy>", line 112, in _get_module_details
+1:   File "/global/u2/c/cainslie/LBNL_dt_scaling/train_2d_turb_ddp.py", line 14, in <module>
+1:     from load_data import *
+1:   File "/global/u2/c/cainslie/LBNL_dt_scaling/load_data.py", line 2, in <module>
+1:     from utilities3 import *
+1: ModuleNotFoundError: No module named 'utilities3'
+0: slurmstepd: error: *** STEP 43784713.0 ON nid008253 CANCELLED AT 2025-10-09T23:23:54 ***
+0: Traceback (most recent call last):
+0:   File "<frozen runpy>", line 189, in _run_module_as_main
+0:   File "<frozen runpy>", line 112, in _get_module_details
+0:   File "/global/u2/c/cainslie/LBNL_dt_scaling/train_2d_turb_ddp.py", line 14, in <module>
+0:     from load_data import *
+0:   File "/global/u2/c/cainslie/LBNL_dt_scaling/load_data.py", line 2, in <module>
+0:     from utilities3 import *
+0: ModuleNotFoundError: No module named 'utilities3'
+srun: error: nid008253: tasks 0-1: Terminated
+srun: Force Terminated StepId=43784713.0

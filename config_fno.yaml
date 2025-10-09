@@ -1,0 +1,83 @@
+# Training Configuration for FNO 2D Turbulence Model
+
+# Data parameters
+data:
+  time_step: 1e-1
+  spinup: 1000
+  N_test: 10000
+  N_train: 11000
+  Nlat: 256
+  Nlon: 256
+  T_train_final: 0.3
+  T_test_final: 0.5
+
+# Training parameters
+training:
+  epochs: 100
+  starting_epoch: 0
+  learning_rate: 1e-4
+  batch_size: 32
+  batch_size_test: 50
+
+# Model architecture parameters
+model:
+  # Architecture type: 'vit' or 'fno'
+  architecture: 'fno'
+  
+  # ViT parameters (used when architecture='vit')
+  img_size: [256, 256]
+  patch_size: [4, 4]
+  in_chans: 1
+  out_chans: 1
+  embed_dim: 256
+  depth: 5
+  num_heads: 8
+  head_dim: 64
+  mlp_dim_multiplier: 4
+  
+  # FNO parameters (used when architecture='fno')
+  modes: 64
+  width: 128
+
+# Optimizer and scheduler parameters
+optimizer:
+  type: "Adam"
+  fused: false
+  scheduler_type: "ExponentialLR"
+  scheduler_gamma: 0.975
+  # Alternative scheduler options:
+  # scheduler_type: "CosineAnnealingWarmRestarts"
+  # scheduler_T_0: 50
+  # scheduler_eta_min: 1e-6
+
+# Loss function parameters
+loss:
+  type: "MSELoss"
+  reduction: "mean"
+
+# Paths
+paths:
+  path_outputs: "/global/homes/c/cainslie/LBNL_dt_scaling/model_ckpts_scratch"
+  net_name: "FNO_Euler_multistep_dt1e-1_flop_and_train_constrained_extra_big"
+  # Checkpoint loading (optional - leave empty to start from scratch)
+  load_checkpoint: ""
+
+# Training options
+options:
+  save_every_n_epochs: 10
+  use_distributed: true
+  backend: "nccl"
+
+# Weights & Biases configuration
+wandb:
+  enabled: true
+  project: "2d-turbulence-fno"
+  entity: null  # Set to your wandb username/team if needed
+  name: null  # Auto-generated if null
+  tags: ["turbulence", "fno", "fourier-neural-operator", "pde"]
+  notes: "Training 2D turbulence model with Fourier Neural Operator"
+  log_model: true
+  log_samples: true
+  log_freq: 10  # Log every N epochs
+  log_gradients: false
+  log_parameters: true
