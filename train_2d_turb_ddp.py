@@ -184,7 +184,7 @@ if current_rank==0:
         print(f"Folder '{net_chkpt_path}' already exists.")
 
 ### load test data ##
-
+# need to move mean and std calculation to a new file
 psi_train_input_Tr_torch = load_train_data_v2(spinup, N_train)
 
 psi_test_input_Tr_torch = load_train_data_v2(N_train + spinup, N_test)
@@ -195,29 +195,22 @@ if current_rank==0:
 m1 = torch.mean(psi_train_input_Tr_torch.flatten())
 s1 = torch.std(psi_train_input_Tr_torch.flatten())
 
-psi_train_input_Tr_torch_norm = (psi_train_input_Tr_torch-m1)/s1
-psi_train_input_Tr_torch_norm.requres_grad = False
 
 m1_test = torch.mean(psi_test_input_Tr_torch.flatten())
 s1_test = torch.std(psi_test_input_Tr_torch.flatten())
 
-psi_test_input_Tr_torch_norm = (psi_test_input_Tr_torch-m1_test)/s1_test
-psi_test_input_Tr_torch_norm.requres_grad = False
-
 del psi_train_input_Tr_torch
-del psi_train_input_Tr_torch_norm
 del psi_test_input_Tr_torch
-del psi_test_input_Tr_torch_norm
 #########
-
 
 m1 = m1.detach().cpu().numpy()
 s1 = s1.detach().cpu().numpy()
 m1_test = m1_test.detach().cpu().numpy()
 s1_test = s1_test.detach().cpu().numpy()
+
 if current_rank==0:
-    print('Detatched m1, s1')
     print(m1, m1_test, s1, s1_test)
+    print('Detatched m1, s1')
 
 dataset = Multistep_TimeSeriesDataset_load_from_file(spinup, N_train, batch_time, lead, m1, s1)
 sampler = torch.utils.data.distributed.DistributedSampler(dataset, shuffle=True, drop_last=False)
@@ -284,11 +277,11 @@ if checkpoint_loaded and loaded_best_loss is not None:
  
 # loss_net = Loss_Singlestep(Step_F, batch_time, loss_fc_RMSE)
 
-loss_net = Loss_Multistep(Step_F, batch_time, loss_fc_RMSE)
+loss_net = Loss_Multistep(Step_F, batch_time, loss_fc_RMSE) # type: ignore
 
 # loss_net_jac = Jacobain_Train_Multistep(Step_F, batch_time, loss_fc_Norm)
 
-loss_net_test = Loss_Multistep_Test(Step_F, batch_time_test, loss_fc_RMSE)
+loss_net_test = Loss_Multistep_Test(Step_F, batch_time_test, loss_fc_RMSE) # type: ignore
 loss_net_test.eval()
 
 torch.set_printoptions(precision=10)
