@@ -86,13 +86,13 @@ def log_to_wandb(wandb_run, metrics, epoch, config, model=None, sample_data=None
                 fig, axes = plt.subplots(1, 2, figsize=(10, 4))
                 
                 # Input
-                im1 = axes[0].imshow(input_sample[0, 0], cmap='viridis')
+                im1 = axes[0].imshow(input_sample[0, 0].T, cmap='viridis')
                 axes[0].set_title('Input Sample')
                 axes[0].axis('off')
                 plt.colorbar(im1, ax=axes[0])
                 
                 # Output
-                im2 = axes[1].imshow(output_sample[0, 0], cmap='viridis')
+                im2 = axes[1].imshow(output_sample[0, 0].T, cmap='viridis')
                 axes[1].set_title('Output Sample')
                 axes[1].axis('off')
                 plt.colorbar(im2, ax=axes[1])
