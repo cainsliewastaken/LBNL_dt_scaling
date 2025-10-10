@@ -133,7 +133,7 @@ current_rank = torch.distributed.get_rank()
 # np.random.seed(0)
 
 device = 'cuda'
-
+ 
 # Initialize Weights & Biases
 wandb_run = init_wandb(config, current_rank)
 
@@ -286,7 +286,7 @@ loss_net_test.eval()
 
 torch.set_printoptions(precision=10)
 
-best_loss = 1e5
+best_loss = 1e2
 # if current_rank==0:
 #     print('Num batches: ',train_data.shape[0])
 # count_parameters(Step_F)
