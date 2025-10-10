@@ -286,9 +286,9 @@ class Loss_Multistep_Test(nn.Module):
 
     def forward(self, batch):        
         x_i = self.model(batch[:,0])
-        # loss = self.loss_func(x_i, batch[:,1])
+        loss = self.loss_func(x_i, batch[:,1])
         for i in range(2, self.batch_time):
             x_i = self.model(x_i)
             # loss = loss + self.loss_func(x_i, batch[:,i])
-        loss = self.loss_func(x_i, batch[:, -1])
+        loss = loss + self.loss_func(x_i, batch[:, -1])
         return loss
