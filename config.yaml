@@ -2,7 +2,7 @@
 
 # Data parameters
 data:
-  time_step: 5e-2
+  time_step: 1e-1
   spinup: 7500
   N_test: 5000
   N_train: 10000
@@ -16,7 +16,7 @@ training:
   epochs: 100
   starting_epoch: 0
   learning_rate: 1e-3
-  batch_size: 32
+  batch_size: 8
   batch_size_test: 100
 
 # Model architecture parameters

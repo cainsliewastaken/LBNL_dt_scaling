@@ -160,6 +160,7 @@ batch_size = config['training']['batch_size']
 batch_size_test = config['training']['batch_size_test']
 batch_time = int(T_train_final/time_step) 
 batch_time_test = int(T_test_final/time_step) 
+
 if batch_time<2:
     batch_time = 2
 
@@ -194,7 +195,6 @@ if current_rank==0:
 
 m1 = torch.mean(psi_train_input_Tr_torch.flatten())
 s1 = torch.std(psi_train_input_Tr_torch.flatten())
-
 
 m1_test = torch.mean(psi_test_input_Tr_torch.flatten())
 s1_test = torch.std(psi_test_input_Tr_torch.flatten())
@@ -287,8 +287,8 @@ loss_net_test.eval()
 torch.set_printoptions(precision=10)
 
 best_loss = 1e2
-# if current_rank==0:
-#     print('Num batches: ',train_data.shape[0])
+if current_rank==0:
+    print('Num batches: ', len(train_data))
 # count_parameters(Step_F)
 
 loss_net = torch.nn.parallel.DistributedDataParallel(loss_net, device_ids=[local_rank], output_device=[local_rank])
