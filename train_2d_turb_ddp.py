@@ -134,9 +134,6 @@ current_rank = torch.distributed.get_rank()
 
 device = 'cuda'
  
-# Initialize Weights & Biases
-wandb_run = init_wandb(config, current_rank)
-
 # Load parameters from config
 time_step = float(config['data']['time_step'])
 lead = int((1/1e-2)*time_step)
@@ -156,8 +153,8 @@ Nlon = config['data']['Nlon']
 T_train_final = config['data']['T_train_final']
 T_test_final = config['data']['T_test_final']
 
-batch_size = config['training']['batch_size']
-batch_size_test = config['training']['batch_size_test']
+batch_size = int(config['training']['batch_size'] / torch.cuda.device_count())
+batch_size_test = int(config['training']['batch_size_test'] / torch.cuda.device_count())
 batch_time = int(T_train_final/time_step) 
 batch_time_test = int(T_test_final/time_step) 
 
@@ -309,6 +306,9 @@ if current_rank==0:
     
     #   Print FLOPs by module
     #   print("FLOPs by module:", flops.by_module())
+
+# Initialize Weights & Biases
+wandb_run = init_wandb(config, current_rank)
 
 for ep in range(starting_epoch, epochs+1):
     running_loss = 0.0

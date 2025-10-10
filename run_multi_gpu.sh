@@ -3,13 +3,13 @@
 #SBATCH -C gpu&hbm80g
 #SBATCH -A m4790
 #SBATCH --qos premium
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=4
 #SBATCH --gpus-per-node=4
 #SBATCH --cpus-per-task=32
-#SBATCH -J ViT_multistep_dt_0.1
-#SBATCH --output ViT_multistep_dt_0.1.out
-#SBATCH --error ViT_multistep_dt_0.1.err
+#SBATCH -J ViT_multistep_dt_0.01
+#SBATCH --output ViT_multistep_dt_0.01.out
+#SBATCH --error ViT_multistep_dt_0.01.err
 #SBATCH --mem=224GB
 
 module load conda
