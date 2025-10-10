@@ -2,7 +2,7 @@
 
 # Data parameters
 data:
-  time_step: 1e-1
+  time_step: 5e-2
   spinup: 7500
   N_test: 5000
   N_train: 10000

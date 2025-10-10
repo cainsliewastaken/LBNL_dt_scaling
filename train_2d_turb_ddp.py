@@ -356,7 +356,8 @@ for ep in range(starting_epoch, epochs+1):
             if config['wandb']['log_samples'] and ep % config['wandb']['log_freq'] == 0:
                 try:
                     sample_batch = next(iter(test_data)).to(device)
-                    sample_data = (sample_batch[:, 0], sample_batch[:, 1])
+                    output = Step_F(sample_batch[0,0])
+                    sample_data = (output, sample_batch[0, 1])
                 except:
                     sample_data = None
             

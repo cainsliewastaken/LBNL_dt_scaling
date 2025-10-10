@@ -83,16 +83,16 @@ def log_to_wandb(wandb_run, metrics, epoch, config, model=None, sample_data=None
                 
                 # Create image plots
                 import matplotlib.pyplot as plt
-                fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+                fig, axes = plt.subplots(1, 2, figsize=(20, 8))
                 
                 # Input
-                im1 = axes[0].imshow(input_sample[0, 0].T, cmap='viridis', vmax=input_sample[0,0].max(), vmin=input_sample[0,0].min())
+                im1 = axes[0].imshow(input_sample.T, cmap='viridis', vmax=input_sample[0,0].max(), vmin=input_sample[0,0].min())
                 axes[0].set_title('Input Sample')
                 axes[0].axis('off')
                 plt.colorbar(im1, ax=axes[0])
                 
                 # Output
-                im2 = axes[1].imshow(output_sample[0, 0].T, cmap='viridis', vmax=input_sample[0,0].max(), vmin=input_sample[0,0].min())
+                im2 = axes[1].imshow(output_sample.T, cmap='viridis', vmax=input_sample[0,0].max(), vmin=input_sample[0,0].min())
                 axes[1].set_title('Output Sample')
                 axes[1].axis('off')
                 plt.colorbar(im2, ax=axes[1])

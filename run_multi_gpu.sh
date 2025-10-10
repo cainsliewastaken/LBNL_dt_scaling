@@ -7,9 +7,9 @@
 #SBATCH --ntasks-per-node=4
 #SBATCH --gpus-per-node=4
 #SBATCH --cpus-per-task=32
-#SBATCH -J ViT_multistep_dt_0.1
-#SBATCH --output ViT_multistep_dt_0.1.out
-#SBATCH --error ViT_multistep_dt_0.1.err
+#SBATCH -J ViT_multistep_dt_0.05
+#SBATCH --output ViT_multistep_dt_0.05.out
+#SBATCH --error ViT_multistep_dt_0.05.err
 #SBATCH --mem=224GB
 
 module load conda
