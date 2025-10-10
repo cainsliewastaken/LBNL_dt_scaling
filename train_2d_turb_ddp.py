@@ -310,7 +310,6 @@ if current_rank==0:
     #   Print FLOPs by module
     #   print("FLOPs by module:", flops.by_module())
 
-temp_cout = 0
 for ep in range(starting_epoch, epochs+1):
     running_loss = 0.0
     sampler.set_epoch(ep)
@@ -332,11 +331,11 @@ for ep in range(starting_epoch, epochs+1):
     scheduler.step()
     with torch.no_grad():
         sampler_test.set_epoch(ep)
-        net_loss = (running_loss/(len(train_data) * batch_time))
+        net_loss = (running_loss/(len(train_data) * T_train_final))
         if current_rank==0:
           print('Starting eval')
         key = np.random.randint(len(test_data))
-        test_loss = loss_net_test(next(iter(test_data)).to(device)) / batch_time_test
+        test_loss = loss_net_test(next(iter(test_data)).to(device)) / T_test_final
         if current_rank==0:
             print(f'Epoch : {ep}, Train Loss : {net_loss}, Test Loss : {test_loss}')
         if current_rank==0:
