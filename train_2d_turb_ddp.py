@@ -332,13 +332,13 @@ for ep in range(starting_epoch, epochs+1):
     scheduler.step()
     with torch.no_grad():
         sampler_test.set_epoch(ep)
-        net_loss = (running_loss/len(train_data))
+        net_loss = (running_loss/(len(train_data) * batch_time))
         if current_rank==0:
           print('Starting eval')
         key = np.random.randint(len(test_data))
-        test_loss = loss_net_test(next(iter(test_data)).to(device))
+        test_loss = loss_net_test(next(iter(test_data)).to(device)) / batch_time_test
         if current_rank==0:
-            print(f'Epoch : {ep}, Train Loss : {net_loss/(batch_time-1)}, Test Loss : {test_loss}')
+            print(f'Epoch : {ep}, Train Loss : {net_loss}, Test Loss : {test_loss}')
         if current_rank==0:
             print('Learning rate', scheduler._last_lr)
         
@@ -346,7 +346,7 @@ for ep in range(starting_epoch, epochs+1):
         if current_rank == 0:
             metrics = {
                 'epoch': ep,
-                'train_loss': net_loss/(batch_time-1),
+                'train_loss': net_loss,
                 'test_loss': test_loss.item() if torch.is_tensor(test_loss) else test_loss,
                 'learning_rate': scheduler._last_lr[0] if isinstance(scheduler._last_lr, list) else scheduler._last_lr,
                 'best_loss': best_loss
