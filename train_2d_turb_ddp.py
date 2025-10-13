@@ -128,6 +128,7 @@ torch.distributed.init_process_group(backend=config['options']['backend'], init_
 local_rank = int(os.environ["LOCAL_RANK"])
 torch.cuda.set_device(local_rank)
 current_rank = torch.distributed.get_rank()
+world_size = int(os.environ['WORLD_SIZE'])
 
 # torch.manual_seed(0)
 # np.random.seed(0)
@@ -153,8 +154,8 @@ Nlon = config['data']['Nlon']
 T_train_final = config['data']['T_train_final']
 T_test_final = config['data']['T_test_final']
 
-batch_size = int(config['training']['batch_size'] / torch.cuda.device_count())
-batch_size_test = int(config['training']['batch_size_test'] / torch.cuda.device_count())
+batch_size = int(config['training']['batch_size'] / world_size)
+batch_size_test = int(config['training']['batch_size_test'] / world_size)
 batch_time = int(T_train_final/time_step) 
 batch_time_test = int(T_test_final/time_step) 
 
@@ -283,7 +284,9 @@ loss_net_test.eval()
 
 torch.set_printoptions(precision=10)
 
-best_loss = 1e2
+if best_loss is None:
+    best_loss = 1e2
+
 if current_rank==0:
     print('Num batches: ', len(train_data))
 # count_parameters(Step_F)
