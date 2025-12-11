@@ -5,7 +5,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
 ################################################################
 #  1d Fourier Integral Operator
 ################################################################
@@ -125,12 +124,9 @@ class FNO1d(nn.Module):
 
     def get_grid(self, shape, device):
         batchsize, size_x = shape[0], shape[1]
-        gridx = torch.tensor(np.linspace(0, 1, size_x), dtype=torch.float)
+        gridx = torch.tensor(torch.linspace(0, 1, size_x), dtype=torch.float, device=device)
         gridx = gridx.reshape(1, size_x, 1).repeat([batchsize, 1, 1])
         return gridx.to(device)
-
-
-
 
 
 
@@ -241,7 +237,7 @@ class FNO2d(nn.Module):
         x = torch.cat((x, grid), dim=-1)
         x = self.p(x)
 
-        x = x.permute(0, 3, 1, 2)
+        x = x.permute(0, 3, 1, 2).contiguous()
         # x = F.pad(x, [0,self.padding, 0,self.padding]) # pad the domain if input is non-periodic
 
         x1 = self.norm(self.conv0(self.norm(x)))
@@ -276,8 +272,10 @@ class FNO2d(nn.Module):
 
     def get_grid(self, shape, device):
         batchsize, size_x, size_y = shape[0], shape[1], shape[2]
-        gridx = torch.tensor(np.linspace(0, 1, size_x), dtype=torch.float)
+        gridx = torch.linspace(0, 1, size_x, dtype=torch.float, device=device, requires_grad=False)
+        # gridx = torch.tensor(np.linspace(0, 1, size_x), dtype=torch.float)
         gridx = gridx.reshape(1, size_x, 1, 1).repeat([batchsize, 1, size_y, 1])
-        gridy = torch.tensor(np.linspace(0, 1, size_y), dtype=torch.float)
+        gridy = torch.linspace(0, 1, size_y, dtype=torch.float, device=device, requires_grad=False)
+        # gridy = torch.tensor(np.linspace(0, 1, size_y), dtype=torch.float)
         gridy = gridy.reshape(1, 1, size_y, 1).repeat([batchsize, size_x, 1, 1])
         return torch.cat((gridx, gridy), dim=-1).to(device)

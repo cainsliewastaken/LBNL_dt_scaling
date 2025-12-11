@@ -1,16 +1,19 @@
 #!/bin/bash -l
-#SBATCH -t 12:00:00
+#SBATCH -t 24:00:00
 #SBATCH -C gpu&hbm80g
 #SBATCH -A m4790
 #SBATCH --qos premium
-#SBATCH --nodes=1
+#SBATCH --nodes=8
 #SBATCH --ntasks-per-node=4
 #SBATCH --gpus-per-node=4
 #SBATCH --cpus-per-task=32
-#SBATCH -J ViT_multistep_dt_0.03
-#SBATCH --output ViT_multistep_dt_0.03.out
-#SBATCH --error ViT_multistep_dt_0.03.err
+#SBATCH -J FNO_multistep_dt_1.5_tfinal_4_v2
+#SBATCH --output FNO_multistep_dt_1.5_tfinal_4_v2.out
+#SBATCH --error FNO_multistep_dt_1.5_tfinal_4_v2.err
 #SBATCH --mem=224GB
+
+#### gpu&hbm80g
+
 
 module load conda
 conda activate cainslie_env
@@ -21,8 +24,7 @@ export MASTER_ADDR=$(hostname)
 cmd="python -u -m train_2d_turb_ddp.py --config config.yaml"
 
 # move wandb cache to scratch
-export WANDB_CACHE_DIR=/pscratch/sd/c/cainslie/wandb_cache
-
+# export WANDB_CACHE_DIR=/pscratch/sd/c/cainslie/wandb_cache
 
 set -x
 srun -l \

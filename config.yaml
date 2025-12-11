@@ -2,47 +2,57 @@
 
 # Data parameters
 data:
-  time_step: 3e-2
-  spinup: 15000
-  N_test: 5000
-  N_train: 15000
+  time_step: 1.5e-0
+  spinup: 20000
+  N_test: 50000
+  N_train: 100000
+  # N_train: 800
   Nlat: 256
   Nlon: 256
-  T_train_final: 0.6
-  T_test_final: 1.0
+  T_train_final: 4.0
+  T_test_final: 4.0
+  stats_path: /global/homes/c/cainslie/LBNL_dt_scaling/training_data/py2d_turb_sims/results/Re1000_fkx4fky4_r0.1_b20/NoSGS/NX256/dt0.0001_IC1/dataset_stats.pkl
 
 # Training parameters
 training:
   epochs: 100
   starting_epoch: 0
-  learning_rate: 1e-3
-  batch_size: 32
-  batch_size_test: 400
+  learning_rate: 1e-4
+  batch_size: 64
+  batch_size_test: 128
 
 # Model architecture parameters
 model:
   # Architecture type: 'vit' or 'fno'
-  architecture: 'vit'
+  architecture: 'fno'
   
   # ViT parameters (used when architecture='vit')
   img_size: [256, 256]
   patch_size: [8,8]
   in_chans: 1
   out_chans: 1
-  embed_dim: 16
-  depth: 5
+  embed_dim: 2560
+  depth: 12
   num_heads: 8
-  head_dim: 64
+  head_dim: 320
   mlp_dim_multiplier: 4
   
   # FNO parameters (used when architecture='fno')
   modes: 64
-  width: 128
+  width: 140
+
+# Paths
+paths:
+  path_outputs: "/global/homes/c/cainslie/LBNL_dt_scaling/model_chkpts_scratch/"
+  net_name: "FNO_Euler_multistep_dt1.5_t_final_4.0"
+  # Checkpoint loading (optional - leave empty to start from scratch)
+  # load_checkpoint: "/global/homes/c/cainslie/LBNL_dt_scaling/model_chkpts_scratch/FNO_Euler_multistep_dt0.6_small/chkpt_FNO_Euler_multistep_dt0.6_small_best_chkpt.pt"
+  load_checkpoint:
 
 # Optimizer and scheduler parameters
 optimizer:
   type: "Adam"
-  fused: true
+  fused: false
   scheduler_type: "ExponentialLR"
   scheduler_gamma: 0.975
   # Alternative scheduler options:
@@ -54,13 +64,6 @@ optimizer:
 loss:
   type: "MSELoss"
   reduction: "mean"
-
-# Paths
-paths:
-  path_outputs: "/global/homes/c/cainslie/LBNL_dt_scaling/model_chkpts_scratch/"
-  net_name: "ViT_Euler_multistep_dt0.03"
-  # Checkpoint loading (optional - leave empty to start from scratch)
-  load_checkpoint: ""
 
 # Training options
 options:
@@ -76,8 +79,8 @@ wandb:
   name: null  # Auto-generated if null
   tags: ["turbulence", "vit", "fno", "pde"]
   notes: "Training 2D turbulence model"
-  log_model: true
-  log_samples: true
-  log_freq: 1  # Log every N epochs
+  log_model: false
+  log_samples: false
+  log_freq: 10  # Log every N epochs
   log_gradients: false
   log_parameters: true

@@ -4,9 +4,10 @@ import yaml
 import argparse
 import wandb
 import torch
+import numpy as np
 from nn_ViT import SimpleViT
 from nn_FNO import FNO2d
-
+from load_data import load_train_data_v2
 
 def load_config(config_path):
     """Load configuration from YAML file."""
@@ -46,7 +47,7 @@ def init_wandb(config, current_rank):
         wandb.init(
             project=config['wandb']['project'],
             entity=config['wandb']['entity'] if config['wandb']['entity'] else None,
-            name=config['wandb']['name'] if config['wandb']['name'] else None,
+            name=config['paths']['net_name'],
             config=wandb_config,
             tags=config['wandb']['tags'],
             notes=config['wandb']['notes']
@@ -125,40 +126,40 @@ def finish_wandb(wandb_run):
             print(f"⚠ Failed to finish wandb run: {e}")
 
 
-def create_model(config, device):
-    """Create model based on configuration."""
-    architecture = config['model']['architecture'].lower()
+# def create_model(config, device):
+#     """Create model based on configuration."""
+#     architecture = config['model']['architecture'].lower()
     
-    if architecture == 'vit':
-        # ViT parameters
-        img_size = tuple(config['model']['img_size'])
-        patch_size = tuple(config['model']['patch_size'])
-        in_chans = config['model']['in_chans']
-        out_chans = config['model']['out_chans']
-        embed_dim = config['model']['embed_dim']
-        depth = config['model']['depth']
-        num_heads = config['model']['num_heads']
-        head_dim = config['model']['head_dim']
-        mlp_dim_multiplier = config['model']['mlp_dim_multiplier']
+#     if architecture == 'vit':
+#         # ViT parameters
+#         img_size = tuple(config['model']['img_size'])
+#         patch_size = tuple(config['model']['patch_size'])
+#         in_chans = config['model']['in_chans']
+#         out_chans = config['model']['out_chans']
+#         embed_dim = config['model']['embed_dim']
+#         depth = config['model']['depth']
+#         num_heads = config['model']['num_heads']
+#         head_dim = config['model']['head_dim']
+#         mlp_dim_multiplier = config['model']['mlp_dim_multiplier']
         
-        model = SimpleViT(
-            img_size, patch_size, out_chans, embed_dim,
-            depth=depth, heads=num_heads, 
-            mlp_dim=embed_dim * mlp_dim_multiplier, 
-            channels=in_chans, dim_head=head_dim
-        ).to(device)
+#         model = SimpleViT(
+#             img_size, patch_size, out_chans, embed_dim,
+#             depth=depth, heads=num_heads, 
+#             mlp_dim=embed_dim * mlp_dim_multiplier, 
+#             channels=in_chans, dim_head=head_dim
+#         ).to(device)
         
-    elif architecture == 'fno':
-        # FNO parameters
-        modes = config['model']['modes']
-        width = config['model']['width']
+#     elif architecture == 'fno':
+#         # FNO parameters
+#         modes = config['model']['modes']
+#         width = config['model']['width']
         
-        model = FNO2d(modes, modes, width).to(device)
+#         model = FNO2d(modes, modes, width).to(device)
         
-    else:
-        raise ValueError(f"Unsupported architecture: {architecture}. Supported: 'vit', 'fno'")
+#     else:
+#         raise ValueError(f"Unsupported architecture: {architecture}. Supported: 'vit', 'fno'")
     
-    return model
+#     return model
 
 
 def load_checkpoint_if_specified(config, model, optimizer, scheduler, device, current_rank):
@@ -216,3 +217,60 @@ def load_checkpoint_if_specified(config, model, optimizer, scheduler, device, cu
         if current_rank == 0:
             print("No checkpoint specified, starting from scratch")
         return False, None, None
+
+
+
+class StatsRecorder:
+    def __init__(self, data=None):
+        """
+        data: ndarray, shape (nobservations, ndimensions)
+        """
+        if data is not None:
+            data = np.atleast_2d(data).T
+            self.mean = data.mean(axis=0)
+            self.std  = data.std(axis=0)
+            self.nobservations = data.shape[0]
+            self.ndimensions   = data.shape[1]
+        else:
+            self.nobservations = 0
+
+    def update(self, data):
+        """
+        data: ndarray, shape (nobservations, ndimensions)
+        """
+        if self.nobservations == 0:
+            self.__init__(data)
+        else:
+            data = np.atleast_2d(data).T
+            if data.shape[1] != self.ndimensions:
+                raise ValueError("Data dims don't match prev observations.")
+
+            newmean = data.mean(axis=0)
+            newstd  = data.std(axis=0)
+
+            m = self.nobservations * 1.0
+            n = data.shape[0]
+
+            tmp = self.mean
+            self.mean = m/(m+n)*tmp + n/(m+n)*newmean
+            self.std  = m/(m+n)*self.std**2 + n/(m+n)*newstd**2 +\
+                        m*n/(m+n)**2 * (tmp - newmean)**2
+            self.std  = np.sqrt(self.std)
+
+            self.nobservations += n
+
+
+
+def calculate_mean_std_large_dataset(spinup, N_final, chunk_size):
+    """
+    Calculates mean and standard deviation for a large dataset. 
+
+    """
+
+    mystats = StatsRecorder()
+
+    for i in np.arange(spinup, N_final, chunk_size):
+        chunk = load_train_data_v2(i, chunk_size)
+        mystats.update(chunk.flatten())
+
+    return mystats

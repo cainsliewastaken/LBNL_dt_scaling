@@ -105,6 +105,6 @@ def load_data_with_lead(start_ind, sequence_len, lead):
      omega_input = f1['Omega']
      input_data[count,0,:,:]=omega_input
      count=count+1
-
+    
     return torch.from_numpy(input_data).float()
 

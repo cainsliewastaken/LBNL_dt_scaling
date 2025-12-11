@@ -96,7 +96,10 @@ class SimpleViT(nn.Module):
             nn.LayerNorm(dim),
         )
 
-        self.pos_embedding = posemb_sincos_2d(
+        # Combine learned and sinusoidal spatial embeddings
+        num_patches = (image_height // patch_height) * (image_width // patch_width)
+        self.learned_pos_embedding = nn.Parameter(torch.randn(1, num_patches, dim))
+        self.sinusoidal_pos_embedding = posemb_sincos_2d(
             h = image_height // patch_height,
             w = image_width // patch_width,
             dim = dim,
@@ -113,7 +116,8 @@ class SimpleViT(nn.Module):
 
         x = self.to_patch_embedding(img)
 
-        x += self.pos_embedding.to(device, dtype=x.dtype)
+        # Combine learned and sinusoidal positional embeddings
+        x += self.learned_pos_embedding + self.sinusoidal_pos_embedding.to(device, dtype=x.dtype)
 
         x = self.transformer(x) #B x nP x L
 

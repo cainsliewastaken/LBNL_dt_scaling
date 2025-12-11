@@ -16,7 +16,6 @@ class PEC_step(nn.Module):
     def forward(self, input_batch):
       output_1 = self.network(input_batch.to(self.device)) + input_batch.to(self.device)
       return input_batch.to(self.device) + self.time_step*0.5*(self.network(input_batch.to(self.device))+self.network(output_1))
-    
 
 class Euler_step(nn.Module):
     def __init__(self, network, device, time_step = 1): 
@@ -27,8 +26,7 @@ class Euler_step(nn.Module):
         self.time_step = time_step
 
     def forward(self, input_batch):
-      return input_batch.to(self.device) + self.time_step*(self.network(input_batch.to(self.device)))
-
+      return input_batch + self.time_step*(self.network(input_batch))
 
 class PEC4_step(nn.Module):
     def __init__(self, network, device, time_step = 1): 
@@ -44,7 +42,6 @@ class PEC4_step(nn.Module):
         output_2 = input_batch.cuda() + self.time_step*0.5*(temp_out_1+self.network(output_1))
         output_3 = input_batch.cuda() + self.time_step*0.5*(temp_out_1+self.network(output_2))
         return input_batch.cuda() + self.time_step*0.5*(temp_out_1+self.network(output_3))
-
 
 class RK4_step(nn.Module):
     def __init__(self, network, device, time_step = 1): 
@@ -97,7 +94,6 @@ class Implicit_Euler_step(nn.Module):
            output = self.implicit_euler(input_batch, output)
            iter += 1
         return output
-
 
 class Switch_Euler_step(nn.Module):
     def __init__(self, network, device, num_iters, time_step = 1): 
@@ -162,9 +158,6 @@ class Switch_Euler_step(nn.Module):
     def train_explicit_trace(self, u_0, u_1, alpha, beta):
        return trace_jacobian_loss(self.explicit_backwards, u_1, u_0, alpha, beta)
 
-
-
-
 class Second_order_multistep(nn.Module):
     def __init__(self, network, device, time_step = 1): 
         super(Second_order_multistep, self).__init__()
@@ -176,8 +169,6 @@ class Second_order_multistep(nn.Module):
 
     def forward(self, input_batch):
       return 2*input_batch[:,1].to(self.device) - input_batch[:,0].to(self.device) + self.time_step.to(self.device)*(self.network(input_batch[:,1].to(self.device)))
-
-
 
 class Second_order_multistep_high_order_dt(nn.Module):
     def __init__(self, network, device, time_step = 1): 
@@ -191,9 +182,6 @@ class Second_order_multistep_high_order_dt(nn.Module):
     def forward(self, input_batch):
       du = (3/2*input_batch[:,-1].to(self.device) - 2*input_batch[:,1].to(self.device) + 1/2*input_batch[:,0])
       return input_batch[:,-1].to(self.device) + du + self.time_step.to(self.device)*(self.network(input_batch[:,-1].to(self.device)))
-
-
-
 
 class Second_order_multistep_high_order_dt_input(nn.Module):
     def __init__(self, network, device, time_step = 1): 
@@ -222,8 +210,6 @@ class Second_order_multistep_3rd_order_udot(nn.Module):
       net_out = self.time_step.to(self.device)*(self.network(torch.cat([input_batch[:,-1].to(self.device), du], dim=2).float())).double()
       return input_batch[:,-1].to(self.device) + du + net_out.float()
 
-
-
 class Third_order_multistep_3rd_order_udot(nn.Module):
     def __init__(self, network, device, time_step = 1): 
         super(Third_order_multistep_3rd_order_udot, self).__init__()
@@ -238,9 +224,6 @@ class Third_order_multistep_3rd_order_udot(nn.Module):
       ddu = 2*input_batch[:,3].to(self.device) - 5*input_batch[:,2].to(self.device) + 4*input_batch[:,1].to(self.device) - 1*input_batch[:,0].to(self.device)
       net_out = self.time_step*(self.network(torch.cat([input_batch[:, -1].to(self.device), du, ddu], dim=2).float()).double())
       return input_batch[:,-1].to(self.device) + du + 0.5*ddu + net_out.float()
-
-
-
 
 class Loss_Singlestep(nn.Module):
     def __init__(self, model, batch_time, loss_func):
@@ -268,25 +251,9 @@ class Loss_Multistep(nn.Module):
         self.loss_func = loss_func
 
     def forward(self, batch):        
-        x_1 = self.model(batch[:,0])
-        loss = self.loss_func(x_1, batch[:,1])
-        x_i = x_1
-        for i in range(2, self.batch_time):
-            x_i = self.model(x_i)
-            loss = loss + self.loss_func(x_i, batch[:,i])
-        return loss
-
-class Loss_Multistep_Test(nn.Module):
-    def __init__(self, model, batch_time, loss_func):
-        super().__init__()
-        self.model = model
-        self.batch_time = batch_time
-        self.loss_func = loss_func
-
-    def forward(self, batch):        
         x_i = self.model(batch[:,0])
         loss = self.loss_func(x_i, batch[:,1])
         for i in range(2, self.batch_time):
             x_i = self.model(x_i)
-            loss = loss + self.loss_func(x_i, batch[:,i])
+            loss += self.loss_func(x_i, batch[:,i])
         return loss
